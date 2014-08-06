@@ -13,6 +13,7 @@ const int sonarDistanceMin = 100;
 const int buzzerDuration = 2000;
 const int buzzerFrequence = 2000;
 
+bool shouldRun = false; // global state variable for remote functions
 int buzzerCountDown = 0;
 
 Ping sonar(sonarPin);
@@ -22,24 +23,49 @@ void setup() {
   pinMode(buzzerPin, OUTPUT);
 
   digitalWrite(ledPin, LOW);
+  
+  Spark.function("start",remoteStart);
+  Spark.function("stop",remoteStop);
 }
 
 void loop() {
-  sonar.fire();
-  double distance = sonar.centimeters();
+  if (shouldRun) {
+    // Running
+    sonar.fire();
+    double distance = sonar.centimeters();
 
-  if ((distance < sonarDistanceMin) && (buzzerCountDown < 0)) {
-    digitalWrite(ledPin, HIGH);
-    tone(buzzerPin, buzzerFrequence, 0);
-    buzzerCountDown = buzzerDuration;
+    if ((distance < sonarDistanceMin) && (buzzerCountDown < 0)) {
+      digitalWrite(ledPin, HIGH);
+      tone(buzzerPin, buzzerFrequence, 0);
+      buzzerCountDown = buzzerDuration;
+    }
+    else if (buzzerCountDown == 0) {
+      digitalWrite(ledPin, LOW);
+      noTone(buzzerPin);
+      buzzerCountDown = -1;
+    }
+    else if (buzzerCountDown > 0) {
+      buzzerCountDown -= loopDuration;
+    }
   }
-  else if (buzzerCountDown == 0) {
+  else if (buzzerCountDown != -1) {
+    // Should Stop
     digitalWrite(ledPin, LOW);
     noTone(buzzerPin);
     buzzerCountDown = -1;
   }
-  else if (buzzerCountDown > 0) {
-    buzzerCountDown -= loopDuration;
-  }
   delay(loopDuration);
+}
+
+/*
+ * Remote functions
+ */
+int remoteStart(String args) {
+    shouldRun = true;
+    return 200;
+}
+
+int remoteStop(String args) {
+    shouldRun = false;
+    return 200;
 }
