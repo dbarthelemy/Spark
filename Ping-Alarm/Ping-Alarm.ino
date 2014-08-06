@@ -18,17 +18,20 @@ int buzzerCountDown = 0;
 
 Ping sonar(sonarPin);
 
-void setup() {
+void setup() 
+{
   pinMode(ledPin, OUTPUT);
   pinMode(buzzerPin, OUTPUT);
 
   digitalWrite(ledPin, LOW);
   
+  Spark.variable("status", &shouldRun, INT);
   Spark.function("start",remoteStart);
   Spark.function("stop",remoteStop);
 }
 
-void loop() {
+void loop() 
+{
   if (shouldRun) {
     // Running
     sonar.fire();
@@ -60,12 +63,14 @@ void loop() {
 /*
  * Remote functions
  */
-int remoteStart(String args) {
+int remoteStart(String args) 
+{
     shouldRun = true;
     return 200;
 }
 
-int remoteStop(String args) {
+int remoteStop(String args) 
+{
     shouldRun = false;
     return 200;
 }
