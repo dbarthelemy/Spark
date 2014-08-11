@@ -38,6 +38,7 @@ void loop()
     double distance = sonar.centimeters();
 
     if ((distance < sonarDistanceMin) && (buzzerCountDown < 0)) {
+      Spark.publish("alarm", NULL, 60, PRIVATE);
       digitalWrite(ledPin, HIGH);
       tone(buzzerPin, buzzerFrequence, 0);
       buzzerCountDown = buzzerDuration;
@@ -66,11 +67,11 @@ void loop()
 int remoteStart(String args) 
 {
     shouldRun = true;
-    return 200;
+    return shouldRun;
 }
 
 int remoteStop(String args) 
 {
     shouldRun = false;
-    return 200;
+    return shouldRun;
 }
